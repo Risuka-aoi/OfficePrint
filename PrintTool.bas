@@ -351,6 +351,13 @@ Private Function GetExtension(ByVal fileName As String) As String
 End Function
 
 Private Sub OutputFileList(ByVal files As Collection)
+    Dim ws As Worksheet
+    Set ws = GetListSheet()
+
+    WriteListHeader ws
+
+    If files.Count = 0 Then Exit Sub
+
     Dim arr() As String
     Dim i As Long
     ReDim arr(1 To files.Count)
@@ -361,11 +368,6 @@ Private Sub OutputFileList(ByVal files As Collection)
     If files.Count > 1 Then
         QuickSortStrings arr, 1, UBound(arr)
     End If
-
-    Dim ws As Worksheet
-    Set ws = GetListSheet()
-
-    WriteListHeader ws
 
     Dim r As Long
     r = 2
