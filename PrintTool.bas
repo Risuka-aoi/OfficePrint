@@ -153,12 +153,10 @@ Public Sub 印刷ボタン_Click()
         ppApp.Visible = False
     End If
 
-    Dim roundNo As Long, r As Long
-    For roundNo = 1 To copies
-        For r = 2 To lastRow
-            ProcessOneRow wsList, r, wordApp, ppApp
-        Next r
-    Next roundNo
+    Dim r As Long
+    For r = 2 To lastRow
+        ProcessOneRow wsList, r, wordApp, ppApp, copies
+    Next r
 
     WriteLog "印刷", "", "成功", "印刷処理を終了しました。", ""
     MsgBox "印刷処理が完了しました。", vbInformation
@@ -183,7 +181,7 @@ Public Sub ログクリアボタン_Click()
     MsgBox "ログをクリアしました。", vbInformation
 End Sub
 
-Private Sub ProcessOneRow(ByVal wsList As Worksheet, ByVal rowIndex As Long, ByVal wordApp As Object, ByVal ppApp As Object)
+Private Sub ProcessOneRow(ByVal wsList As Worksheet, ByVal rowIndex As Long, ByVal wordApp As Object, ByVal ppApp As Object, ByVal copies As Long)
     On Error GoTo EH
 
     Dim fileType As String, fileName As String, fullPath As String
@@ -212,11 +210,11 @@ Private Sub ProcessOneRow(ByVal wsList As Worksheet, ByVal rowIndex As Long, ByV
 
     Select Case fileType
         Case "Excel"
-            PrintExcelFile fullPath
+            PrintExcelFile fullPath, copies
         Case "Word"
-            PrintWordFile wordApp, fullPath
+            PrintWordFile wordApp, fullPath, copies
         Case "PowerPoint"
-            PrintPowerPointFile ppApp, fullPath
+            PrintPowerPointFile ppApp, fullPath, copies
         Case Else
             Err.Raise vbObjectError + 5000, , "未対応のファイル種別です: " & fileType
     End Select
@@ -230,7 +228,7 @@ EH:
     WriteLog "印刷", fileName, "失敗", "印刷処理に失敗しました: " & Err.Description, fullPath
 End Sub
 
-Private Sub PrintExcelFile(ByVal fullPath As String)
+Private Sub PrintExcelFile(ByVal fullPath As String, ByVal copies As Long)
     Dim targetBook As Workbook
     Dim oldAutomationSecurity As MsoAutomationSecurity
 
@@ -239,7 +237,7 @@ Private Sub PrintExcelFile(ByVal fullPath As String)
 
     On Error GoTo EH
     Set targetBook = Application.Workbooks.Open(Filename:=fullPath, UpdateLinks:=False, ReadOnly:=True)
-    targetBook.PrintOut
+    targetBook.PrintOut Copies:=copies
 Cleanup:
     On Error Resume Next
     If Not targetBook Is Nothing Then targetBook.Close SaveChanges:=False
@@ -250,11 +248,11 @@ EH:
     Resume Cleanup
 End Sub
 
-Private Sub PrintWordFile(ByVal wordApp As Object, ByVal fullPath As String)
+Private Sub PrintWordFile(ByVal wordApp As Object, ByVal fullPath As String, ByVal copies As Long)
     Dim doc As Object
     On Error GoTo EH
     Set doc = wordApp.Documents.Open(FileName:=fullPath, ReadOnly:=True, AddToRecentFiles:=False)
-    doc.PrintOut
+    doc.PrintOut Background:=False, Copies:=copies
 Cleanup:
     On Error Resume Next
     If Not doc Is Nothing Then doc.Close SaveChanges:=False
@@ -264,11 +262,11 @@ EH:
     Resume Cleanup
 End Sub
 
-Private Sub PrintPowerPointFile(ByVal ppApp As Object, ByVal fullPath As String)
+Private Sub PrintPowerPointFile(ByVal ppApp As Object, ByVal fullPath As String, ByVal copies As Long)
     Dim pres As Object
     On Error GoTo EH
     Set pres = ppApp.Presentations.Open(FileName:=fullPath, ReadOnly:=msoTrue, Untitled:=msoFalse, WithWindow:=msoFalse)
-    pres.PrintOut
+    pres.PrintOut Copies:=copies
 Cleanup:
     On Error Resume Next
     If Not pres Is Nothing Then pres.Close
