@@ -11,8 +11,8 @@ Private Const SHEET_LIST As String = "ファイル一覧"
 Private Const SHEET_LOG As String = "ログ"
 
 '--- メインシート入力セル
-Private Const CELL_TARGET_FOLDER As String = "B2"
-Private Const CELL_COPIES As String = "B3"
+Private Const CELL_TARGET_FOLDER As String = "C4"
+Private Const CELL_COPIES As String = "C5"
 
 '--- ファイル一覧列
 Private Const COL_PRINT_TARGET As Long = 1 'A
