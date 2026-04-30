@@ -281,12 +281,15 @@ Private Function TryGetCopies(ByRef copies As Long) As Boolean
         Exit Function
     End If
 
-    If CLng(v) <> CDbl(v) Or CLng(v) <= 0 Then
-        MsgBox "全体部数は1以上の整数で入力してください。", vbExclamation
+    Dim numericValue As Double
+    numericValue = CDbl(v)
+
+    If numericValue <> Fix(numericValue) Or numericValue <= 0 Or numericValue > CLng(2147483647) Then
+        MsgBox "全体部数は1以上2,147,483,647以下の整数で入力してください。", vbExclamation
         Exit Function
     End If
 
-    copies = CLng(v)
+    copies = CLng(numericValue)
     TryGetCopies = True
 End Function
 
