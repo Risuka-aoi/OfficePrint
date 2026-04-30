@@ -40,12 +40,8 @@ Public Sub 一覧抽出ボタン_Click()
     On Error GoTo EH
 
     Dim targetFolder As String
-    targetFolder = Trim$(CStr(GetMainSheet().Range(CELL_TARGET_FOLDER).Value))
-
-    If Len(targetFolder) = 0 Then
-        MsgBox "対象フォルダを入力してください。", vbExclamation
-        Exit Sub
-    End If
+    targetFolder = SelectTargetFolder()
+    If Len(targetFolder) = 0 Then Exit Sub
 
     If Not FolderExists(targetFolder) Then
         MsgBox "対象フォルダが存在しません。", vbExclamation
@@ -83,6 +79,20 @@ EH:
     WriteLog "一覧抽出", "", "失敗", "一覧抽出でエラーが発生しました: " & Err.Description, ""
     MsgBox "一覧抽出でエラーが発生しました: " & Err.Description, vbCritical
 End Sub
+
+Private Function SelectTargetFolder() As String
+    Dim fd As FileDialog
+    Set fd = Application.FileDialog(msoFileDialogFolderPicker)
+
+    With fd
+        .Title = "対象フォルダを選択してください"
+        .AllowMultiSelect = False
+        If .Show <> -1 Then Exit Function
+        SelectTargetFolder = CStr(.SelectedItems(1))
+    End With
+
+    GetMainSheet().Range(CELL_TARGET_FOLDER).Value = SelectTargetFolder
+End Function
 
 Public Sub 印刷ボタン_Click()
     On Error GoTo FatalEH
