@@ -117,14 +117,14 @@ Public Sub 印刷ボタン_Click()
         Exit Sub
     End If
 
-    Dim totalJobs As Long
-    totalJobs = printTargetCount * copies
+    Dim totalJobs As Double
+    totalJobs = CDbl(printTargetCount) * CDbl(copies)
 
     Dim msg As String
     msg = "以下の条件で印刷を開始します。" & vbCrLf & _
           "印刷対象ファイル数：" & CStr(printTargetCount) & "件" & vbCrLf & _
           "全体部数：" & CStr(copies) & "部" & vbCrLf & _
-          "合計印刷処理回数：" & CStr(totalJobs) & "回" & vbCrLf & _
+          "合計印刷処理回数：" & Format$(totalJobs, "0") & "回" & vbCrLf & _
           "印刷を開始しますか？"
 
     If MsgBox(msg, vbYesNoCancel + vbQuestion) <> vbYes Then Exit Sub
