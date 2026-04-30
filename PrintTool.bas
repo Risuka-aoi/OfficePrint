@@ -235,6 +235,8 @@ End Sub
 Private Sub PrintExcelFile(ByVal fullPath As String)
     Dim targetBook As Workbook
     Dim oldAutomationSecurity As MsoAutomationSecurity
+    Dim hadError As Boolean
+    Dim errMsg As String
 
     oldAutomationSecurity = Application.AutomationSecurity
     Application.AutomationSecurity = msoAutomationSecurityForceDisable
@@ -247,13 +249,20 @@ Cleanup:
     If Not targetBook Is Nothing Then targetBook.Close SaveChanges:=False
     Application.AutomationSecurity = oldAutomationSecurity
     On Error GoTo 0
+    If hadError Then
+        Err.Raise vbObjectError + 5101, "PrintExcelFile", errMsg
+    End If
     Exit Sub
 EH:
+    hadError = True
+    errMsg = Err.Description
     Resume Cleanup
 End Sub
 
 Private Sub PrintWordFile(ByVal wordApp As Object, ByVal fullPath As String)
     Dim doc As Object
+    Dim hadError As Boolean
+    Dim errMsg As String
     On Error GoTo EH
     Set doc = wordApp.Documents.Open(FileName:=fullPath, ReadOnly:=True, AddToRecentFiles:=False)
     doc.PrintOut Background:=False, Copies:=1
@@ -261,13 +270,20 @@ Cleanup:
     On Error Resume Next
     If Not doc Is Nothing Then doc.Close SaveChanges:=False
     On Error GoTo 0
+    If hadError Then
+        Err.Raise vbObjectError + 5102, "PrintWordFile", errMsg
+    End If
     Exit Sub
 EH:
+    hadError = True
+    errMsg = Err.Description
     Resume Cleanup
 End Sub
 
 Private Sub PrintPowerPointFile(ByVal ppApp As Object, ByVal fullPath As String)
     Dim pres As Object
+    Dim hadError As Boolean
+    Dim errMsg As String
     On Error GoTo EH
     Set pres = ppApp.Presentations.Open(FileName:=fullPath, ReadOnly:=msoTrue, Untitled:=msoFalse, WithWindow:=msoFalse)
     pres.PrintOut Copies:=1
@@ -275,8 +291,13 @@ Cleanup:
     On Error Resume Next
     If Not pres Is Nothing Then pres.Close
     On Error GoTo 0
+    If hadError Then
+        Err.Raise vbObjectError + 5103, "PrintPowerPointFile", errMsg
+    End If
     Exit Sub
 EH:
+    hadError = True
+    errMsg = Err.Description
     Resume Cleanup
 End Sub
 
