@@ -137,8 +137,9 @@ Public Sub 印刷ボタン_Click()
     If HasTypeInList(wsList, lastRow, "Word") Then
         Set wordApp = CreateObject("Word.Application")
         If wordApp Is Nothing Then
+            WriteLog "印刷", "", "失敗", "Wordアプリケーションを起動できません。", ""
             MsgBox "Wordアプリケーションを起動できません。", vbCritical
-            Exit Sub
+            GoTo Cleanup
         End If
         wordApp.Visible = False
     End If
@@ -320,6 +321,8 @@ Private Function JudgePrintTarget(ByVal v As Variant) As TargetJudge
 End Function
 
 Private Sub CollectTargetFiles(ByVal folder As Object, ByVal includeSub As Boolean, ByRef files As Collection)
+    On Error GoTo EH
+
     Dim file As Object
     For Each file In folder.Files
         If IsTargetFile(CStr(file.Name)) Then
@@ -333,6 +336,11 @@ Private Sub CollectTargetFiles(ByVal folder As Object, ByVal includeSub As Boole
             CollectTargetFiles subFolder, True, files
         Next subFolder
     End If
+    Exit Sub
+
+EH:
+    WriteLog "一覧抽出", "", "警告", "フォルダを読み取れなかったため一部をスキップしました: " & CStr(folder.Path) & " / " & Err.Description, ""
+    Err.Clear
 End Sub
 
 Private Function IsTargetFile(ByVal fileName As String) As Boolean
